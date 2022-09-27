@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
-# script that doubles the number of webservers and adds new configs
+# install nginx on your web-01 server
+# Nginx should be listening on port 80
 
-# install nginx
-apt-get  update ; apt-get -y install nginx
+apt-get update
+apt-get -y install nginx
+ufw allow 'Nginx HTTP'
 echo "Hello World!" > /var/www/html/index.html
-string="http {\n\tadd_header X-Served-By \"$HOSTNAME\";"
-sudo sed -i "s/http {/$string/" /etc/nginx/nginx.conf
-# restart nginx
-sudo service nginx restart
+new_string="\t\tadd_header X-Served-By $(hostname);"
+sed -i "s/^\tlocation \/ {$/&\n$new_string/" /etc/nginx/sites-available/default
+service nginx restart
