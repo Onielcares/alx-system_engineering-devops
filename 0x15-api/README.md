@@ -11,11 +11,11 @@ This is a perfect example of a task that is not suited for Bash scripting, so le
 ### Read or watch:
 
 - [Friends don’t let friends program in shell script]()
-What is an API
-What is an API? In English, please
-What is a REST API
-What are microservices
-PEP8 Python style - having a clean code respecting style guide is really appreciated in the industry
+- [What is an API]()
+- [What is an API? In English, please]()
+- [What is a REST API]()
+- [What are microservices]()
+- [PEP8 Python style - having a clean code respecting style guide is really appreciated in the industry]()
 # Learning Objectives
 At the end of this project, you are expected to be able to explain to anyone, without the help of Google:
 
