@@ -10,7 +10,7 @@ This is a perfect example of a task that is not suited for Bash scripting, so le
 # Resources
 ### Read or watch:
 
-![url]Friends don’t let friends program in shell script
+![url](Friends don’t let friends program in shell script)
 What is an API
 What is an API? In English, please
 What is a REST API
