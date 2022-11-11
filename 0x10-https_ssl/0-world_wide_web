@@ -1,23 +1,20 @@
 #!/usr/bin/env bash
-# configuring a subdomian for my web servers
+# A bash script that will display information about subdomains
 
-if [ "$#" -lt 2 ]
+subs=("www" "lb-01" "web-01" "web-02")
+
+function dns_info ()
+{
+ 	read -r -a lines < <( dig "$1" | grep -A1 'ANSWER SECTION' | grep "$1" | awk '{print $4, $5}')
+ 	echo "The subdomain ${2} is a ${lines[0]} record and points to ${lines[1]}"
+}
+
+if [ -z "$2" ]
 then
-    for subd in www lb-01 web-01 web-02
-    do
-	dig "$subd.$1" | awk -v subd="$subd" '/ANSWER SECTION:/ {
-                                              getline; print "The subdomain",
-                                              subd,"is a",
-                                              $(NF-1),"record and points",
-                                              "to",$NF
-                                             }'
-
-   done
+	for sub in "${subs[@]}"
+	do
+		dns_info "${sub}.${1}" "$sub"
+	done
 else
-    dig "$2.$1" | awk -v subd="$2" '/ANSWER SECTION:/ {
-                                              getline; print "The subdomain",
-                                              subd,"is a",
-                                              $(NF-1),"record and points",
-                                              "to",$NF
-                                             }'
+	dns_info "${2}.${1}" "${2}"
 fi
