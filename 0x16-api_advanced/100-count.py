@@ -1,58 +1,48 @@
 #!/usr/bin/python3
-''' task 2 module'''
-
+"""
+Defines a function that queries Reddit API
+"""
 import requests
 
 
-def count_words(subreddit, word_list, count_list=[], next_page=None):
-    """Request subreddit recursively using pagination
+def count_words(subreddit, word_list, after=None, sort=True):
     """
-    # convert word_list to dict with count
-    if not count_list:
-        for word in word_list:
-            count_list.append(dict({'keyword': word,
-                                    'count': 0}))
-
-    # NETWORKING
-    # set custom user-agent
-    user_agent = '0x16-api_advanced-jmajetich'
+    Queries the Reddit API, parses the title of all hot articles,
+    and prints a sorted count of given keywords (case-insensitive, delimited
+    by spaces. Javascript should count as javascript, but java should not)
+    Ags:
+        subreddit (str): name of subreddit
+        word_list (list): keywords to look out for
+        after (str): identifier of the last item on a listing
+        worddict (dict): results to be returned
+        ctr (int): condition to convert word_list to worddict
+    Returns:
+        worddict (dict) || None if subreddit is invalid
+    """
     url = 'https://www.reddit.com/r/{}/hot.json'.format(subreddit)
-    # if page specified, pass as parameter
-    if next_page:
-        url += '?after={}'.format(next_page)
-
-    headers = {'User-Agent': user_agent}
-
-    r = requests.get(url, headers=headers, allow_redirects=False)
-
-    if r.status_code != 200:
-        return
-
-    # DATA PARSING
-    # load response unit from json
-    data = r.json()['data']
-
-    # extract list of pages
-    posts = data['children']
-    for post in posts:
-        title = post['data']['title']
-        for item in count_list:
-            title_lower = title.lower()
-            title_list = title_lower.split()
-            item['count'] += title_list.count(item['keyword'].lower())
-
-    next_page = data['after']
-    if next_page is not None:
-        return count_words(subreddit, word_list, count_list, next_page)
-    else:
-        # sort list by count
-        sorted_list = sorted(count_list,
-                             key=lambda word: (word['count'], word['keyword']),
-                             reverse=True)
-        keywords_matched = 0
-        # print keywords and counts
-        for word in sorted_list:
-            if word['count'] > 0:
-                print('{}: {}'.format(word['keyword'], word['count']))
-                keywords_matched += 1
-        return
+    params = {'after': after, 'limit': 100}
+    headers = {'User-Agent': 'advanced-api/0.0.1 by Mendy'}
+    req = requests.get(url=url,
+                       params=params, headers=headers, allow_redirects=False)
+    if req.status_code == 200:
+        response = req.json()
+        titles = [child['data']['title']
+                  for child in response['data']['children']]
+        after = response['data']['after']
+        if after is not None:
+            titles += count_words(subreddit,
+                                  word_list, after=after, sort=False)
+        if sort is True:
+            count = {k.lower(): 0 for k in word_list}
+            for title in titles:
+                count = {k: v + title.lower().split().count(k)
+                         for k, v in count.items()}
+            count = {k: v for k, v in count.items() if v > 0}
+            if len(count):
+                word_list = [w.lower() for w in word_list]
+                count = {k: v * word_list.count(k)
+                         for k, v in count.items()}
+                count = sorted(count.items(), key=lambda kv: (-kv[1], kv[0]))
+                [print("{}: {}".format(k, v)) for k, v in count]
+        else:
+            return titles
