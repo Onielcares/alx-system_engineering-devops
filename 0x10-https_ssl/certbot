@@ -1,0 +1,22 @@
+#1 ssh into the server
+
+#2 install snapd. Follow this guide https://snapcraft.io/docs/installing-snapd
+
+#3 Ensure that your version of snapd is up to date
+$ sudo snap install core; sudo snap refresh core
+
+#4 Remove certbot-auto and any Certbot OS packages
+$ sudo apt-get remove certbot
+
+#5 Install Certbot
+$ sudo snap install --classic certbot
+
+#6 Prepare the Certbot command
+$ sudo ln -s /snap/bin/certbot /usr/bin/certbot
+
+#7 Choose how you'd like to run Certbot
+$ sudo certbot certonly --standalone # if your server is not current running on the machine
+$ sudo certbot certonly --webroot # if it is running and do not want to stop it while certbot installs
+
+#8 Install your certificate
+$ sudo snap install --classic certbot
