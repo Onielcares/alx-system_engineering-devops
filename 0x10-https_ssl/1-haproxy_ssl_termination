@@ -1,3 +1,13 @@
+frontend http
+        bind *:80
+        bind *:443 ssl crt /etc/letsencrypt/live/www.onielcares.tech/fullchain.pem
+        default_backend web-backend
+
+backend web-backend
+        balance roundrobin
+        server 7790-web-01 54.237.80.247:80 check
+        server 7790-web-02 54.237.37.123:80 check
+
 global
         log /dev/log    local0
         log /dev/log    local1 notice
@@ -32,13 +42,3 @@ defaults
         errorfile 502 /etc/haproxy/errors/502.http
         errorfile 503 /etc/haproxy/errors/503.http
         errorfile 504 /etc/haproxy/errors/504.http
-
-frontend http
-        bind *:80
-        bind *:443 ssl crt /etc/letsencrypt/live/www.cloudmendy.tech/fullchain.pem
-        default_backend web-backend
-
-backend web-backend
-        balance roundrobin
-	server 7790-web-01 web-01.cloudmendy.tech:80 check
-	server 7790-web-02 web-02.cloudmendy.tech:80 check
